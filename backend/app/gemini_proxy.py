@@ -17,13 +17,56 @@ from typing import Any, AsyncIterator, Callable
 
 import httpx
 
-GEMINI_OPENAI_BASE = os.environ.get(
-    "ONHAND_THREAD_GEMINI_OPENAI_BASE",
-    "https://generativelanguage.googleapis.com/v1beta/openai",
-)
 TUTOR_MODEL = os.environ.get("ONHAND_THREAD_TUTOR_MODEL", "gemini-3.6-flash")
 
+# Two ways to reach Gemini's OpenAI-compatible surface:
+# - Vertex AI (default in production): bills the GCP project, auths with the
+#   service's own credentials (ADC) — no API key, no AI Studio prepay.
+# - Gemini Developer API: needs GOOGLE_API_KEY; used for local dev.
+USE_VERTEX = os.environ.get("ONHAND_THREAD_USE_VERTEX", "") == "1"
+_VERTEX_PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+_VERTEX_LOCATION = os.environ.get("GOOGLE_CLOUD_LOCATION", "global")
+if USE_VERTEX:
+    _host = (
+        "aiplatform.googleapis.com"
+        if _VERTEX_LOCATION == "global"
+        else f"{_VERTEX_LOCATION}-aiplatform.googleapis.com"
+    )
+    GEMINI_OPENAI_BASE = (
+        f"https://{_host}/v1/projects/{_VERTEX_PROJECT}"
+        f"/locations/{_VERTEX_LOCATION}/endpoints/openapi"
+    )
+else:
+    GEMINI_OPENAI_BASE = os.environ.get(
+        "ONHAND_THREAD_GEMINI_OPENAI_BASE",
+        "https://generativelanguage.googleapis.com/v1beta/openai",
+    )
+
 _client = httpx.AsyncClient(timeout=httpx.Timeout(600.0, connect=20.0))
+
+_adc_credentials = None
+
+
+def bearer_token(api_key: str) -> str:
+    """API key for the Developer API; a fresh ADC access token for Vertex."""
+    if not USE_VERTEX:
+        return api_key
+    global _adc_credentials
+    import google.auth
+    import google.auth.transport.requests
+
+    if _adc_credentials is None:
+        _adc_credentials, _ = google.auth.default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+    if not _adc_credentials.valid:
+        _adc_credentials.refresh(google.auth.transport.requests.Request())
+    return _adc_credentials.token
+
+
+def qualified_model(model: str) -> str:
+    """Vertex's OpenAI surface namespaces Google models as google/<model>."""
+    return f"google/{model}" if USE_VERTEX and "/" not in model else model
 
 # Gemini requires the thought_signature it emitted with a tool call to come
 # back when that tool call is replayed in conversation history. OpenAI
@@ -151,9 +194,12 @@ async def stream_completion(
 
     Calls on_complete(assistant_text) once the upstream stream finishes.
     """
-    body = sanitize_body({**body, "model": TUTOR_MODEL})
+    body = sanitize_body({**body, "model": qualified_model(TUTOR_MODEL)})
     attach_thought_signatures(body)
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {bearer_token(api_key)}",
+        "Content-Type": "application/json",
+    }
     assistant_parts: list[str] = []
     ids_by_index: dict[int, str] = {}
     async with _client.stream(
@@ -184,9 +230,12 @@ async def stream_completion(
 
 async def completion(body: dict[str, Any], api_key: str) -> tuple[int, dict[str, Any], str]:
     """Non-streaming completion. Returns (status, json_body, assistant_text)."""
-    body = sanitize_body({**body, "model": TUTOR_MODEL})
+    body = sanitize_body({**body, "model": qualified_model(TUTOR_MODEL)})
     attach_thought_signatures(body)
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {bearer_token(api_key)}",
+        "Content-Type": "application/json",
+    }
     response = await _client.post(
         f"{GEMINI_OPENAI_BASE}/chat/completions", json=body, headers=headers
     )

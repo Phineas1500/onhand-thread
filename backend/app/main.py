@@ -81,7 +81,7 @@ async def chat_completions(
     except json.JSONDecodeError:
         raise HTTPException(400, "invalid JSON body")
 
-    api_key = os.environ["GOOGLE_API_KEY"]
+    api_key = os.environ.get("GOOGLE_API_KEY", "")  # unused in Vertex mode
     model = await store.get(learner_id)
     gemini_proxy.inject_learner_context(body, learner_context_block(model))
 

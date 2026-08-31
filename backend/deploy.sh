@@ -50,7 +50,7 @@ gcloud run deploy "$SERVICE" \
   --region "$REGION" \
   --allow-unauthenticated \
   --memory 512Mi \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,ONHAND_THREAD_TUTOR_MODEL=gemini-3.6-flash,ONHAND_THREAD_DISTILL_MODEL=gemini-3.6-flash" \
+  --set-env-vars "GOOGLE_CLOUD_PROJECT=$PROJECT,ONHAND_THREAD_TUTOR_MODEL=gemini-3.6-flash,ONHAND_THREAD_DISTILL_MODEL=gemini-3.6-flash,ONHAND_THREAD_USE_VERTEX=1,GOOGLE_GENAI_USE_VERTEXAI=TRUE,GOOGLE_CLOUD_LOCATION=global" \
   --set-secrets "GOOGLE_API_KEY=$SECRET_NAME:latest"
 
 URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format 'value(status.url)')
