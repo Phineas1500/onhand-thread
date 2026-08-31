@@ -133,16 +133,22 @@ async def telemetry(request: Request):
         etype = str(event.get("type", ""))
         await store.log_event(learner_id, event)
         if etype == "check_resolved":
-            await store.record_check(learner_id, bool(event.get("correct")))
+            # assessment vocabulary from the extension: correct | partial |
+            # incorrect | skipped
+            assessment = str(event.get("assessment", ""))
+            if assessment in {"correct", "partial", "incorrect"}:
+                await store.record_check(learner_id, assessment == "correct")
             observation = (
                 f"Learning check on page {event.get('page', '')!r}.\n"
-                f"Question: {event.get('question', '')}\n"
                 f"Concept: {event.get('concept', '')}\n"
-                f"Student answered: {event.get('answer', '')}\n"
-                f"Correct: {event.get('correct')}. "
-                f"Expected: {event.get('expected', '(not given)')}"
+                f"Question: {event.get('question', '')}\n"
+                f"Tutor assessed the student's answer as: {assessment}\n"
+                f"Evidence: {event.get('evidence', '')}"
             )
-            learner_agent.distill_in_background(store, learner_id, observation, "check")
+            if assessment != "skipped":
+                learner_agent.distill_in_background(
+                    store, learner_id, observation, "check"
+                )
         elif etype == "learner_feedback":
             learner_agent.distill_in_background(
                 store,
