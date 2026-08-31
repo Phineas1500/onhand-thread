@@ -71,6 +71,41 @@ def _harvest_signatures(delta: dict[str, Any], ids_by_index: dict[int, str]) -> 
             _remember_signature(ids_by_index.get(index, ""), sig)
 
 
+# Gemini's OpenAI-compat endpoint rejects ANY unknown field with a 400
+# ("Unknown name ..."), and OpenAI clients freely send OpenAI-only params
+# (store, metadata, service_tier, ...). Forward only what Gemini documents.
+ALLOWED_PARAMS = {
+    "model",
+    "messages",
+    "stream",
+    "stream_options",
+    "temperature",
+    "top_p",
+    "n",
+    "max_tokens",
+    "max_completion_tokens",
+    "stop",
+    "presence_penalty",
+    "frequency_penalty",
+    "seed",
+    "tools",
+    "tool_choice",
+    "parallel_tool_calls",
+    "response_format",
+    "reasoning_effort",
+    "logprobs",
+    "top_logprobs",
+    "modalities",
+    "audio",
+    "user",
+    "extra_body",
+}
+
+
+def sanitize_body(body: dict[str, Any]) -> dict[str, Any]:
+    return {k: v for k, v in body.items() if k in ALLOWED_PARAMS}
+
+
 def message_text(content: Any) -> str:
     """Flatten OpenAI message content (string or parts list) to text."""
     if isinstance(content, str):
@@ -116,7 +151,7 @@ async def stream_completion(
 
     Calls on_complete(assistant_text) once the upstream stream finishes.
     """
-    body = {**body, "model": TUTOR_MODEL}
+    body = sanitize_body({**body, "model": TUTOR_MODEL})
     attach_thought_signatures(body)
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     assistant_parts: list[str] = []
@@ -149,7 +184,7 @@ async def stream_completion(
 
 async def completion(body: dict[str, Any], api_key: str) -> tuple[int, dict[str, Any], str]:
     """Non-streaming completion. Returns (status, json_body, assistant_text)."""
-    body = {**body, "model": TUTOR_MODEL}
+    body = sanitize_body({**body, "model": TUTOR_MODEL})
     attach_thought_signatures(body)
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     response = await _client.post(
