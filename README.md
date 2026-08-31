@@ -29,9 +29,9 @@ Cloud Run: Thread service (FastAPI)
 
 ## Repository layout
 
-- `extension/` — the Chrome extension (browser tutor UI, page/PDF context, learning checks)
-- `backend/` — the Thread service: FastAPI facade, ADK learner-model agent, Firestore memory
-- `docs/` — architecture notes and submission materials
+- `packages/browser-extension/` — the Chrome extension (browser tutor UI, page/PDF context, learning checks); load this directory unpacked
+- `backend/` — the Thread service: FastAPI facade, ADK learner-model agent, Firestore memory, deploy scripts
+- `docs/` — architecture diagram, demo setup, submission materials
 
 ## Provenance
 
