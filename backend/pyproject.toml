@@ -1,0 +1,22 @@
+[project]
+name = "onhand-thread-backend"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Phineas1500", email = "41450967+Phineas1500@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "google-adk>=2.8.0",
+    "google-cloud-firestore>=2.29.0",
+    "httpx>=0.28.1",
+    "uvicorn[standard]>=0.52.4",
+]
+
+[project.scripts]
+onhand-thread-backend = "onhand_thread_backend:main"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"
