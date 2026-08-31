@@ -29,6 +29,21 @@ The next time you open the tutor — new tab, new day, new topic — Gemini teac
 
 The extension UI and browsing machinery derive from [Onhand](https://github.com/Phineas1500/Onhand) (Apache-2.0), base commit `7a4078e`. Built new during the submission period: the entire Thread service (Gemini facade, ADK learner-model agent, Firestore memory, Cloud Run deployment) and the extension's Thread provider + learning-event sync.
 
+## How this differs from upstream Onhand
+
+Upstream Onhand *records* learning events; Thread adds an agent that *interprets* them — and makes the interpretation durable.
+
+Base Onhand's Learning Mode logs concepts, checks, and graded answers into a per-session state in the browser (IndexedDB), summarizes it back into the prompt within that session, and schedules spaced-repetition reviews. It's a good lab notebook for one class session.
+
+Thread adds a teaching assistant who reads the notebook after class:
+
+- **An independent judge, not the tutor grading itself.** The ADK learner-model agent runs after each turn with its own instructions and tools, and makes calls a deterministic event log can't: slip vs. shaky vs. misconception, when to upgrade a concept to solid, when two phrasings are the same concept (so evidence accumulates), and when to record nothing at all (`note_no_update`).
+- **It reads the raw conversation, not just explicit events.** A misconception embedded in how a question is *phrased* ("so the NIC transmits slower, right?") is captured even though no learning check ever opened on it.
+- **The model is longitudinal and about the learner, not the session.** One Firestore document per learner — concept statuses with evidence, the specific wrong beliefs they've held, teaching preferences, check statistics — keyed by a token that survives sessions, restarts, and devices.
+- **It changes future teaching mechanically, everywhere.** The Cloud Run service injects the learner model into the system context of every model call, so a brand-new conversation with zero client state still opens knowing the learner's misconceptions.
+
+That is the category brief made concrete — feedback captured as durable judgment, so the agent "constantly adapts to the user's unique way of thinking" — and it's why the project "enhances and builds upon" the open-source base rather than repackaging it.
+
 ## Demo script (4 min)
 
 1. (0:00) The amnesia problem, one sentence. Open a TCP article, ask a question that reveals the NIC-bitrate misconception.
