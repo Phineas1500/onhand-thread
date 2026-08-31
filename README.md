@@ -35,7 +35,7 @@ Cloud Run: Thread service (FastAPI)
 
 ## Provenance
 
-The extension is derived from [Onhand](https://github.com/sriramk/onhand) (Apache-2.0), an open-source contextual learning assistant, at base commit `7a4078e` (2026-08-26). Everything in `backend/` — the ADK learner-model agent, the Firestore learner memory, the Cloud Run service — plus the extension's Thread provider integration was built new during the hackathon submission period.
+The extension is derived from [Onhand](https://github.com/Phineas1500/Onhand) (Apache-2.0), an open-source contextual learning assistant, at base commit `7a4078e` (2026-08-26). Everything in `backend/` — the ADK learner-model agent, the Firestore learner memory, the Cloud Run service — plus the extension's Thread provider integration was built new during the hackathon submission period.
 
 ## License
 

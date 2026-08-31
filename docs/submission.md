@@ -27,7 +27,7 @@ The next time you open the tutor — new tab, new day, new topic — Gemini teac
 
 ## What's pre-existing vs. new
 
-The extension UI and browsing machinery derive from [Onhand](https://github.com/sriramk/onhand) (Apache-2.0), base commit `7a4078e`. Built new during the submission period: the entire Thread service (Gemini facade, ADK learner-model agent, Firestore memory, Cloud Run deployment) and the extension's Thread provider + learning-event sync.
+The extension UI and browsing machinery derive from [Onhand](https://github.com/Phineas1500/Onhand) (Apache-2.0), base commit `7a4078e`. Built new during the submission period: the entire Thread service (Gemini facade, ADK learner-model agent, Firestore memory, Cloud Run deployment) and the extension's Thread provider + learning-event sync.
 
 ## Demo script (4 min)
 
