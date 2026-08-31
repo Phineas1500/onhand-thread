@@ -3,6 +3,7 @@ const THEME_STORAGE_KEY = "onhandSidebarTheme";
 const CODEX_PROVIDER = "openai-codex";
 const CODEX_MODEL = "gpt-5.5";
 const FREE_TIER_PROVIDER = "onhand-free";
+const THREAD_PROVIDER = "onhand-thread";
 const API_PROVIDERS = {
 	openai: {
 		name: "OpenAI API",
@@ -31,6 +32,16 @@ const API_PROVIDERS = {
 		keyLabel: "OpenRouter API key",
 		keyPlaceholder: "sk-or-...",
 		capabilities: { realtime: false, vision: false, tools: true, structuredOutput: false },
+	},
+	"onhand-thread": {
+		name: "Onhand Thread (Gemini + memory)",
+		defaultModel: "gemini-3.6-flash",
+		keyLabel: "No key needed",
+		keyPlaceholder: "",
+		keyless: true,
+		// The Thread service pins its Gemini model server-side.
+		lockedModels: true,
+		capabilities: { realtime: false, vision: true, tools: true, structuredOutput: false },
 	},
 	"onhand-free": {
 		name: "Onhand Free (beta)",
@@ -122,6 +133,10 @@ function isFreeTierMode() {
 	return authModeInput.value === "free";
 }
 
+function isThreadMode() {
+	return authModeInput.value === "thread";
+}
+
 function getProviderMeta(providerId) {
 	return API_PROVIDERS[providerId] || API_PROVIDERS.openai;
 }
@@ -137,12 +152,14 @@ function getProviderDefaultModel(providerId) {
 
 function selectedProvider() {
 	if (isCodexSignInMode()) return CODEX_PROVIDER;
+	if (isThreadMode()) return THREAD_PROVIDER;
 	if (isFreeTierMode()) return FREE_TIER_PROVIDER;
 	return providerInput.value || "openai";
 }
 
 function selectedApiKeyProvider() {
 	if (isCodexSignInMode()) return "openai";
+	if (isThreadMode()) return THREAD_PROVIDER;
 	if (isFreeTierMode()) return FREE_TIER_PROVIDER;
 	return providerInput.value || "openai";
 }
@@ -195,7 +212,7 @@ function populateModelSelect(providerId, selectedId) {
 }
 
 function isOpenAiApiKeyMode() {
-	return !isCodexSignInMode() && !isFreeTierMode() && (providerInput.value || "openai") === "openai";
+	return !isCodexSignInMode() && !isThreadMode() && !isFreeTierMode() && (providerInput.value || "openai") === "openai";
 }
 
 function isRealtimeVoiceEnabled() {
@@ -255,6 +272,14 @@ function syncAuthModeFields() {
 		}
 		populateModelSelect(providerId, aiModelInput.value.trim());
 		modelHelpEl.textContent = "Codex sign-in uses your selected OpenAI Codex model for text chat. GPT-5.6 availability follows your Codex plan. Switch Authentication to Provider API key if you want text chat to use an API key.";
+	} else if (isThreadMode()) {
+		providerFieldEl.hidden = true;
+		modelSelectEl.disabled = true;
+		aiModelInput.disabled = true;
+		aiModelInput.value = getProviderDefaultModel(THREAD_PROVIDER);
+		populateModelSelect(THREAD_PROVIDER, aiModelInput.value);
+		modelHelpEl.textContent =
+			"Onhand Thread runs Gemini through the Thread service (Cloud Run) and keeps a persistent learner model in Firestore — no API key needed. Your tutor remembers you across sessions.";
 	} else if (isFreeTierMode()) {
 		providerFieldEl.hidden = true;
 		modelSelectEl.disabled = true;
@@ -347,8 +372,14 @@ async function loadForm() {
 	if (runtimeSettings.aiApiKey && !pendingApiKeys.openai) pendingApiKeys.openai = runtimeSettings.aiApiKey;
 	const storedProvider = API_PROVIDERS[runtimeSettings.aiProvider] ? runtimeSettings.aiProvider : "openai";
 	authModeInput.value =
-		runtimeSettings.authMode === "api-key" ? (storedProvider === FREE_TIER_PROVIDER ? "free" : "api-key") : "oauth";
-	providerInput.value = storedProvider === FREE_TIER_PROVIDER ? "openai" : storedProvider;
+		runtimeSettings.authMode === "api-key"
+			? storedProvider === THREAD_PROVIDER
+				? "thread"
+				: storedProvider === FREE_TIER_PROVIDER
+					? "free"
+					: "api-key"
+			: "oauth";
+	providerInput.value = storedProvider === FREE_TIER_PROVIDER || storedProvider === THREAD_PROVIDER ? "openai" : storedProvider;
 	realtimeVoiceEnabledInput.checked = Boolean(runtimeSettings.realtimeVoiceEnabled);
 	diagnosticsEnabledInput.checked = Boolean(runtimeSettings.diagnosticsEnabled);
 	advancedRuntimeInspectionEnabledInput.checked = runtimeSettings.advancedRuntimeInspectionEnabled !== false;
@@ -357,7 +388,13 @@ async function loadForm() {
 	// first-run Options save (e.g. adding an API key) would write an explicit
 	// false and silently opt the user out before their first turn.
 	experimentalModelLaneClassifierInput.checked = runtimeSettings.experimentalModelLaneClassifier !== false;
-	const modelProviderId = isCodexSignInMode() ? CODEX_PROVIDER : isFreeTierMode() ? FREE_TIER_PROVIDER : providerInput.value;
+	const modelProviderId = isCodexSignInMode()
+		? CODEX_PROVIDER
+		: isThreadMode()
+			? THREAD_PROVIDER
+			: isFreeTierMode()
+				? FREE_TIER_PROVIDER
+				: providerInput.value;
 	aiModelInput.value = runtimeSettings.aiModel || getProviderDefaultModel(modelProviderId);
 	syncAuthModeFields();
 }

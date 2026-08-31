@@ -3849,8 +3849,8 @@
 			<p class="onhand-auth-copy">Pick how Onhand should run. You can change this anytime in options.</p>
 			<div class="onhand-auth-choices">
 				<button id="authFreeTierButton" class="onhand-auth-choice" type="button" ${authSigningIn ? "disabled" : ""}>
-					<span class="onhand-auth-choice-title">Try Onhand free</span>
-					<span class="onhand-auth-choice-copy">No account or key needed. Capped daily usage.</span>
+					<span class="onhand-auth-choice-title">Start with Onhand Thread</span>
+					<span class="onhand-auth-choice-copy">Gemini-powered tutor with persistent learning memory. No key needed.</span>
 				</button>
 				<button id="authSignInButton" class="onhand-auth-choice" type="button" ${authSigningIn ? "disabled" : ""}>
 					<span class="onhand-auth-choice-title">${authSigningIn ? "Signing in..." : "Sign in with ChatGPT"}</span>
@@ -3866,16 +3866,16 @@
 	}
 
 	async function chooseFreeTierFromSidebar() {
-		authStatusText = "Setting up Onhand Free...";
+		authStatusText = "Setting up Onhand Thread...";
 		authStatusKind = "";
 		renderAuthPanel(currentState || {});
 		const response = await chrome.runtime.sendMessage({
 			type: "browser-runtime:update-settings",
 			authMode: "api-key",
-			aiProvider: "onhand-free",
-			aiModel: "deepseek/deepseek-v4-flash",
+			aiProvider: "onhand-thread",
+			aiModel: "gemini-3.6-flash",
 		});
-		if (!response?.ok) throw new Error(response?.error || "Could not enable the free tier.");
+		if (!response?.ok) throw new Error(response?.error || "Could not enable Onhand Thread.");
 		authStatusText = "";
 		await requestState();
 	}
