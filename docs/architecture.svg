@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5f6368"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="675" fill="#f8f9fa"/>
+  <text x="60" y="64" font-size="30" font-weight="700" fill="#202124">Onhand Thread — a browser tutor that remembers how you learn</text>
+  <text x="60" y="94" font-size="17" fill="#5f6368">Chrome extension → Cloud Run → Gemini + ADK learner-model agent → Firestore persistent memory</text>
+
+  <!-- Extension -->
+  <rect x="60" y="150" width="270" height="340" rx="14" fill="#ffffff" stroke="#dadce0" stroke-width="2"/>
+  <rect x="60" y="150" width="270" height="54" rx="14" fill="#e8f0fe"/>
+  <rect x="60" y="190" width="270" height="14" fill="#e8f0fe"/>
+  <text x="195" y="184" font-size="19" font-weight="700" fill="#1a73e8" text-anchor="middle">Chrome extension</text>
+  <text x="80" y="238" font-size="15" fill="#3c4043">Tutor beside any page or PDF</text>
+  <text x="80" y="266" font-size="15" fill="#3c4043">• Page + PDF context capture</text>
+  <text x="80" y="292" font-size="15" fill="#3c4043">• Anchored highlights &amp; notes</text>
+  <text x="80" y="318" font-size="15" fill="#3c4043">• Learning checks (predict / recall)</text>
+  <text x="80" y="344" font-size="15" fill="#3c4043">• Client-side agent loop</text>
+  <rect x="80" y="380" width="230" height="84" rx="10" fill="#fef7e0" stroke="#f9ab00"/>
+  <text x="94" y="408" font-size="14" font-weight="700" fill="#b06000">Anonymous device token</text>
+  <text x="94" y="430" font-size="13.5" fill="#7f5700">= stable learner identity,</text>
+  <text x="94" y="450" font-size="13.5" fill="#7f5700">memory survives every session</text>
+
+  <!-- Cloud Run -->
+  <rect x="430" y="150" width="330" height="340" rx="14" fill="#ffffff" stroke="#dadce0" stroke-width="2"/>
+  <rect x="430" y="150" width="330" height="54" rx="14" fill="#e6f4ea"/>
+  <rect x="430" y="190" width="330" height="14" fill="#e6f4ea"/>
+  <text x="595" y="184" font-size="19" font-weight="700" fill="#188038" text-anchor="middle">Thread service · Cloud Run</text>
+
+  <rect x="450" y="222" width="290" height="108" rx="10" fill="#f1f8f4" stroke="#ceead6"/>
+  <text x="464" y="250" font-size="15" font-weight="700" fill="#188038">Tutor lane (streaming)</text>
+  <text x="464" y="274" font-size="13.5" fill="#3c4043">OpenAI-compatible SSE facade</text>
+  <text x="464" y="294" font-size="13.5" fill="#3c4043">injects learner model into context,</text>
+  <text x="464" y="314" font-size="13.5" fill="#3c4043">streams Gemini, tees the reply</text>
+
+  <rect x="450" y="352" width="290" height="118" rx="10" fill="#f1f8f4" stroke="#ceead6"/>
+  <text x="464" y="380" font-size="15" font-weight="700" fill="#188038">Learner-model agent · Google ADK</text>
+  <text x="464" y="404" font-size="13.5" fill="#3c4043">Runs after every turn &amp; check.</text>
+  <text x="464" y="424" font-size="13.5" fill="#3c4043">Judges: slip, shaky, or misconception?</text>
+  <text x="464" y="444" font-size="13.5" fill="#3c4043">Tools: upsert_concept · set_preference</text>
+  <text x="464" y="462" font-size="13.5" fill="#3c4043">· note_no_update</text>
+
+  <!-- Gemini -->
+  <rect x="870" y="150" width="270" height="140" rx="14" fill="#ffffff" stroke="#dadce0" stroke-width="2"/>
+  <rect x="870" y="150" width="270" height="54" rx="14" fill="#fce8e6"/>
+  <rect x="870" y="190" width="270" height="14" fill="#fce8e6"/>
+  <text x="1005" y="184" font-size="19" font-weight="700" fill="#d93025" text-anchor="middle">Gemini 3.6 Flash</text>
+  <text x="890" y="236" font-size="14.5" fill="#3c4043">Powers both the tutoring</text>
+  <text x="890" y="258" font-size="14.5" fill="#3c4043">conversation and the</text>
+  <text x="890" y="280" font-size="14.5" fill="#3c4043">learner-model agent</text>
+
+  <!-- Firestore -->
+  <rect x="870" y="350" width="270" height="200" rx="14" fill="#ffffff" stroke="#dadce0" stroke-width="2"/>
+  <rect x="870" y="350" width="270" height="54" rx="14" fill="#fef7e0"/>
+  <rect x="870" y="390" width="270" height="14" fill="#fef7e0"/>
+  <text x="1005" y="384" font-size="19" font-weight="700" fill="#b06000" text-anchor="middle">Firestore learner model</text>
+  <text x="890" y="434" font-size="14" fill="#3c4043">concepts: solid · shaky ·</text>
+  <text x="890" y="454" font-size="14" fill="#3c4043">misconception (+ evidence)</text>
+  <text x="890" y="478" font-size="14" fill="#3c4043">teaching preferences</text>
+  <text x="890" y="502" font-size="14" fill="#3c4043">check stats + event audit trail</text>
+  <text x="890" y="526" font-size="14" font-weight="700" fill="#b06000">durable across sessions</text>
+
+  <!-- Arrows -->
+  <line x1="330" y1="255" x2="430" y2="255" stroke="#5f6368" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="380" y="240" font-size="12.5" fill="#5f6368" text-anchor="middle">chat (SSE)</text>
+  <line x1="330" y1="415" x2="430" y2="415" stroke="#5f6368" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="380" y="400" font-size="12.5" fill="#5f6368" text-anchor="middle">learning events</text>
+
+  <line x1="760" y1="240" x2="870" y2="220" stroke="#5f6368" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="760" y1="400" x2="870" y2="250" stroke="#5f6368" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <line x1="760" y1="440" x2="870" y2="460" stroke="#5f6368" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <text x="815" y="470" font-size="12.5" fill="#5f6368" text-anchor="middle">writes memory</text>
+  <path d="M 870 500 C 640 590 520 540 500 490" fill="none" stroke="#f9ab00" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+  <text x="660" y="580" font-size="13" font-weight="700" fill="#b06000" text-anchor="middle">learner model injected into every future tutoring turn</text>
+
+  <text x="60" y="630" font-size="14" fill="#5f6368">All Things Agentic Hackathon · Collaborative Partner · Gemini + ADK + Cloud Run + Firestore</text>
+</svg>
