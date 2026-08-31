@@ -4,9 +4,9 @@
 
 1. Build the extension: `npm ci && npm run build:extension`
 2. Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and pick `packages/browser-extension/`.
-3. Open the Onhand Thread side panel (puzzle icon → Onhand Thread, or Cmd+Shift+Space). The deployed Cloud Run URL is baked in as the default; to point at a different backend, set it from the extension's service-worker console:
+3. Open the Onhand Thread side panel (puzzle icon → Onhand Thread, or Cmd+Shift+Space). The deployed backend URL (`https://8-233-210-178.sslip.io/v1` — global ALB → Cloud Run) is baked in as the default; to point at a different backend (e.g. `http://127.0.0.1:8787/v1` for local dev), set it from the extension's service-worker console:
    ```js
-   chrome.storage.local.set({ onhandThreadBaseUrl: "https://<service-url>/v1" })
+   chrome.storage.local.set({ onhandThreadBaseUrl: "https://<backend>/v1" })
    ```
 4. First request auto-registers an anonymous learner token (`chrome.storage.local.onhandThreadToken`). To demo "fresh learner", remove that key; to demo cross-session memory, keep it.
 

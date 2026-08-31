@@ -10,6 +10,8 @@ Onhand Thread is a Chrome extension + cloud agent built for the All Things Agent
 Chrome extension (Onhand Thread)
         │  OpenAI-compatible SSE + learning-event telemetry
         ▼
+Cloud Load Balancing (global ALB + serverless NEG)
+        ▼
 Cloud Run: Thread service (FastAPI)
    ├── /v1/chat/completions ──► Gemini (context enriched with learner model)
    ├── /v1/telemetry ─────────► learning events (checks opened/resolved)
@@ -22,7 +24,7 @@ Cloud Run: Thread service (FastAPI)
 
 - **Gemini** powers both the tutoring conversation and the learner-model agent.
 - **Google ADK** (Agent Development Kit) runs the learner-model agent: an LLM agent with Firestore tools that decides *what is worth remembering* about the learner after every turn.
-- **Cloud Run** hosts the Thread service.
+- **Cloud Run** hosts the Thread service, fronted by **Cloud Load Balancing** (global ALB with a serverless NEG and a Google-managed TLS certificate).
 - **Firestore** is the persistent learner memory, keyed by learner and durable across sessions and devices.
 
 ## Repository layout

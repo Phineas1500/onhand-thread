@@ -438,7 +438,10 @@ const ONHAND_THREAD_PROVIDER = "onhand-thread";
 const ONHAND_THREAD_MODEL = "gemini-3.6-flash";
 const ONHAND_THREAD_BASE_URL_STORAGE_KEY = "onhandThreadBaseUrl";
 const ONHAND_THREAD_TOKEN_STORAGE_KEY = "onhandThreadToken";
-const ONHAND_THREAD_DEFAULT_BASE_URL = "https://onhand-thread-bqesxqrexa-ue.a.run.app/v1";
+// Global ALB (serverless NEG -> Cloud Run onhand-thread, us-east1). The
+// service's own *.run.app URL is bypassed: on this project those hostnames
+// 404 at Google's edge (known platform issue with newly created services).
+const ONHAND_THREAD_DEFAULT_BASE_URL = "https://8-233-210-178.sslip.io/v1";
 const ONHAND_FREE_QUOTA_BYPASS_STORAGE_KEY = "onhandFreeTierQuotaBypassSecret";
 const ONHAND_FREE_QUOTA_BYPASS_EXPIRES_AT_STORAGE_KEY = "onhandFreeTierQuotaBypassExpiresAt";
 const ONHAND_FREE_QUOTA_BYPASS_HEADER = "X-Onhand-Quota-Bypass";
