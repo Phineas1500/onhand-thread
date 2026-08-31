@@ -31,6 +31,19 @@ else
   echo "secret already exists (delete it to rotate)"
 fi
 
+echo "== IAM for the default compute service account =="
+# New GCP projects no longer grant these by default: source builds need the
+# builder role; the running service reads the secret and writes Firestore.
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+for role in roles/cloudbuild.builds.builder roles/datastore.user; do
+  gcloud projects add-iam-policy-binding "$PROJECT" \
+    --member="serviceAccount:$COMPUTE_SA" --role="$role" --condition=None >/dev/null
+done
+gcloud secrets add-iam-policy-binding "$SECRET_NAME" \
+  --member="serviceAccount:$COMPUTE_SA" \
+  --role=roles/secretmanager.secretAccessor >/dev/null
+
 echo "== Deploying to Cloud Run =="
 gcloud run deploy "$SERVICE" \
   --source "$BACKEND_DIR" \
